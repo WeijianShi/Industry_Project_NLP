@@ -30,7 +30,7 @@ NDA = NDA.dropna(how = 'all')
 
 #draw the graph indicating the original classification method
 NDA['Category'].value_counts().plot(kind = "bar")
-plt.show()
+# plt.show()
 
 
 '''a function which re-catogerize the NDA clauses in order to improve model accuracy and make the 
@@ -62,7 +62,7 @@ NDA['CAT'] = NDA.apply(lambda row: reclassify(row), axis = 1)
 NDA['CAT'].value_counts()
 #draw the graph indicating the new classification method
 NDA['CAT'].value_counts().plot(kind = "bar")
-plt.show()
+# plt.show()
 
 #data cleaning process 
 NDA = NDA.reset_index(drop=True)
@@ -83,6 +83,127 @@ def clean_text(para):
 
 
 NDA['cleaned_txt'] = NDA['Text'].apply(clean_text) #the cleaned data
-print(NDA.head())
+
+
+#make the categories of the clauses into numerical category and split the train/test
+NDA = NDA[['CAT', 'cleaned_txt']]
+NDA = NDA[NDA['CAT'] != "GEN"] #remove the general category
+NDA = NDA.reset_index(drop=True)
+
+NDA['CAT_label'] = pd.Categorical(NDA['CAT'])
+NDA['CAT'] = NDA['CAT_label'].cat.codes
+NDA, NDA_test = train_test_split(NDA, test_size = 0.2, stratify = NDA[['CAT']])
+
+
+############################set up bert model############################
+# Name of the BERT model to use
+model_name = 'bert-base-uncased'
+
+# Max length of tokens
+max_length = 100
+
+# Load transformers config and set output_hidden_states to False
+config = BertConfig.from_pretrained(model_name)
+config.output_hidden_states = False
+
+# Load BERT tokenizer
+tokenizer = BertTokenizerFast.from_pretrained(pretrained_model_name_or_path = model_name, config = config)
+
+# Load the Transformers BERT model
+transformer_model = TFBertModel.from_pretrained(model_name, config = config)
+
+
+############################Build the model############################
+
+# Load the MainLayer
+bert = transformer_model.layers[0]
+
+# Build your model input
+input_ids = Input(shape=(max_length,), name='input_ids', dtype='int32')
+# attention_mask = Input(shape=(max_length,), name='attention_mask', dtype='int32') 
+# inputs = {'input_ids': input_ids, 'attention_mask': attention_mask}
+inputs = {'input_ids': input_ids}
+
+# Load the Transformers BERT model as a layer in a Keras model
+bert_model = bert(inputs)[1]
+dropout = Dropout(config.hidden_dropout_prob, name='pooled_output')
+pooled_output = dropout(bert_model, training=False)
+
+# Then build your model output
+CAT = Dense(units=len(NDA.CAT_label.value_counts()), kernel_initializer=TruncatedNormal(stddev=config.initializer_range), name='CAT')(pooled_output)
+outputs = {'CAT': CAT}
+
+# And combine it all in a model object
+model = Model(inputs=inputs, outputs=outputs, name='BERT_MultiLabel_MultiClass')
+
+# Take a look at the model
+model.summary()
+
+
+############################Train the model############################
+
+# Set an optimizer
+optimizer = Adam(
+    learning_rate=5e-05,
+    epsilon=1e-08,
+    decay=0.01,
+    clipnorm=1.0)
+
+# Set loss and metrics
+loss = {'CAT': CategoricalCrossentropy(from_logits = True)}
+metric = {'CAT': CategoricalAccuracy('accuracy')}
+
+# Compile the model
+model.compile(
+    optimizer = optimizer,
+    loss = loss, 
+    metrics = metric)
+
+# Ready output data for the model
+y_CAT = to_categorical(NDA['CAT'])
+
+# Tokenize the input (takes some time)
+x = tokenizer(
+    text=NDA['cleaned_txt'].to_list(),
+    add_special_tokens=True,
+    max_length=max_length,
+    truncation=True,
+    padding=True, 
+    return_tensors='tf',
+    return_token_type_ids = False,
+    return_attention_mask = True,
+    verbose = True)
+
+# Fit the model
+history = model.fit(
+    # x={'input_ids': x['input_ids'], 'attention_mask': x['attention_mask']},
+    x={'input_ids': x['input_ids']},
+    y={'CAT': y_CAT},
+    validation_split=0.2,
+    batch_size=64,
+    epochs=10)
     
 
+### ----- Evaluate the model ------ ###
+
+# Ready test data
+test_y_CAT = to_categorical(NDA_test['CAT'])
+
+test_x = tokenizer(
+    text=NDA_test['cleaned_txt'].to_list(),
+    add_special_tokens=True,
+    max_length=max_length,
+    truncation=True,
+    padding=True, 
+    return_tensors='tf',
+    return_token_type_ids = False,
+    return_attention_mask = False,
+    verbose = True)
+
+# Run evaluation
+model_eval = model.evaluate(
+    x={'input_ids': test_x['input_ids']},
+    y={'CAT': test_y_CAT}
+)
+
+print(model_eval)
