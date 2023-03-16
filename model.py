@@ -12,6 +12,7 @@ import seaborn as sns
 from nltk.corpus import stopwords
 from plotly.offline import iplot
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import classification_report
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.initializers import TruncatedNormal
 from tensorflow.keras.layers import Dense, Dropout, Input
@@ -21,6 +22,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.utils import to_categorical
 from transformers import BertConfig, BertTokenizerFast, TFBertModel
+
 
 
 #read in the data
@@ -95,6 +97,7 @@ NDA['CAT'] = NDA['CAT_label'].cat.codes
 NDA, NDA_test = train_test_split(NDA, test_size = 0.2, stratify = NDA[['CAT']])
 
 
+
 ############################set up bert model############################
 # Name of the BERT model to use
 model_name = 'bert-base-uncased'
@@ -162,6 +165,7 @@ model.compile(
 # Ready output data for the model
 y_CAT = to_categorical(NDA['CAT'])
 
+
 # Tokenize the input (takes some time)
 x = tokenizer(
     text=NDA['cleaned_txt'].to_list(),
@@ -181,7 +185,7 @@ history = model.fit(
     y={'CAT': y_CAT},
     validation_split=0.2,
     batch_size=64,
-    epochs=10)
+    epochs=1)
     
 
 ### ----- Evaluate the model ------ ###
@@ -201,9 +205,25 @@ test_x = tokenizer(
     verbose = True)
 
 # Run evaluation
-model_eval = model.evaluate(
-    x={'input_ids': test_x['input_ids']},
-    y={'CAT': test_y_CAT}
-)
+# model_eval = model.evaluate(
+#     x={'input_ids': test_x['input_ids']},
+#     y={'CAT': test_y_CAT}
+# )
 
-print(model_eval)
+# print(model_eval)
+
+
+#evaluation in more detail
+def convert_prediction(matrix):
+    row = matrix.shape[0]
+    prediction = np.zeros(row)
+    for i in range(row):
+        prediction[i] = np.argmax(matrix[i])
+    return prediction
+
+
+
+# target_names = ['DEF', 'EXP', 'GOV', 'REM', 'RIG', 'TER', 'WAR']
+print(classification_report(NDA_test['CAT'], convert_prediction(model.predict(test_x['input_ids']['CAT']))))
+
+
