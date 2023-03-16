@@ -123,8 +123,6 @@ bert = transformer_model.layers[0]
 
 # Build your model input
 input_ids = Input(shape=(max_length,), name='input_ids', dtype='int32')
-# attention_mask = Input(shape=(max_length,), name='attention_mask', dtype='int32') 
-# inputs = {'input_ids': input_ids, 'attention_mask': attention_mask}
 inputs = {'input_ids': input_ids}
 
 # Load the Transformers BERT model as a layer in a Keras model
@@ -180,12 +178,11 @@ x = tokenizer(
 
 # Fit the model
 history = model.fit(
-    # x={'input_ids': x['input_ids'], 'attention_mask': x['attention_mask']},
     x={'input_ids': x['input_ids']},
     y={'CAT': y_CAT},
     validation_split=0.2,
     batch_size=64,
-    epochs=1)
+    epochs=10)
     
 
 ### ----- Evaluate the model ------ ###
@@ -223,7 +220,8 @@ def convert_prediction(matrix):
 
 
 
-# target_names = ['DEF', 'EXP', 'GOV', 'REM', 'RIG', 'TER', 'WAR']
-print(classification_report(NDA_test['CAT'], convert_prediction(model.predict(test_x['input_ids']['CAT']))))
+target_names = ['DEF', 'EXP', 'GOV', 'REM', 'RIG', 'TER', 'WAR']
+result = model.predict(test_x['input_ids'])
+print(classification_report(NDA_test['CAT'], convert_prediction(result['CAT']), target_names= target_names))
 
 
