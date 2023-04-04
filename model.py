@@ -1,5 +1,6 @@
 #package imports
 import re
+import torch
 
 
 # import matplotlib.pyplot as plt
@@ -182,7 +183,7 @@ history = model.fit(
     y={'CAT': y_CAT},
     validation_split=0.2,
     batch_size=64,
-    epochs=10)
+    epochs=1)
     
 
 ### ----- Evaluate the model ------ ###
@@ -216,5 +217,13 @@ target_names = ['DEF', 'EXP', 'GOV', 'REM', 'RIG', 'TER', 'WAR']
 result = model.predict(test_x['input_ids'])
 print(classification_report(NDA_test['CAT'], convert_prediction(result['CAT']), target_names= target_names))
 
+
+model.save('my_model.h5')
+
+# Recreate the exact same model, including its weights and the optimizer
+new_model = tensorflow.keras.models.load_model('my_model.h5')
+
+# Show the model architecture
+new_model.summary()
 
 
