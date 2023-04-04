@@ -1,12 +1,12 @@
 #package imports
 import re
 
-import cufflinks
-import matplotlib.pyplot as plt
+
+# import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import plotly.figure_factory as ff
-import seaborn as sns
+# import plotly.figure_factory as ff
+# import seaborn as sns
 
 
 from nltk.corpus import stopwords
@@ -200,14 +200,6 @@ test_x = tokenizer(
     return_token_type_ids = False,
     return_attention_mask = False,
     verbose = True)
-
-# Run evaluation
-# model_eval = model.evaluate(
-#     x={'input_ids': test_x['input_ids']},
-#     y={'CAT': test_y_CAT}
-# )
-
-# print(model_eval)
 
 
 #evaluation in more detail
