@@ -183,7 +183,7 @@ history = model.fit(
     y={'CAT': y_CAT},
     validation_split=0.2,
     batch_size=64,
-    epochs=1)
+    epochs=10)
     
 
 ### ----- Evaluate the model ------ ###
