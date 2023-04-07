@@ -1,12 +1,13 @@
 #package imports
 import re
+import tensorflow
 
-import cufflinks
-import matplotlib.pyplot as plt
+
+# import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
-import plotly.figure_factory as ff
-import seaborn as sns
+# import plotly.figure_factory as ff
+# import seaborn as sns
 
 
 from nltk.corpus import stopwords
@@ -201,14 +202,6 @@ test_x = tokenizer(
     return_attention_mask = False,
     verbose = True)
 
-# Run evaluation
-# model_eval = model.evaluate(
-#     x={'input_ids': test_x['input_ids']},
-#     y={'CAT': test_y_CAT}
-# )
-
-# print(model_eval)
-
 
 #evaluation in more detail
 def convert_prediction(matrix):
@@ -224,5 +217,13 @@ target_names = ['DEF', 'EXP', 'GOV', 'REM', 'RIG', 'TER', 'WAR']
 result = model.predict(test_x['input_ids'])
 print(classification_report(NDA_test['CAT'], convert_prediction(result['CAT']), target_names= target_names))
 
+
+model.save('my_model.h5')
+
+# Recreate the exact same model, including its weights and the optimizer
+new_model = tensorflow.keras.models.load_model('my_model.h5')
+
+# Show the model architecture
+new_model.summary()
 
 
