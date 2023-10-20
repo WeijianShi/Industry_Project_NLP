@@ -29,7 +29,7 @@ Welcome to the NDA Processing Tool! This tool is designed by Weijian Shi, Shaoxi
 - **Deleting the original NDA.docx:** After successfully downloading the new docx file, remember to delete the original "NDA.docx" to avoid confusion.
 - **Technical Support:** If you encounter any issues or accidentally delete important files, please contact our technical team at ws2679@columbia.edu for assistance.
 
-### Model Selection (Step 4)
+### Model Selection
 
 - **Only Dealbreaker NDA Specialized Search.ipynb:** This option uses Specialized Search Logic to process NDA documents.
 - **Only Dealbreaker NDA Global Search.ipynb:** This option uses Global Search Logic to process NDA documents.
