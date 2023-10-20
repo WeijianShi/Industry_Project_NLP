@@ -1,6 +1,6 @@
 # DG Venture Law Firm 
 
-## Instruction Manual
+## Instruction Manual--NDA Processing Tool
 
 Welcome to the NDA Processing Tool! This tool is designed by Weijian Shi, Shaoxiong Jia, and Yichen Li. The purpose is to help you efficiently process Non-Disclosure Agreement (NDA) documents and extract the desired content. Please follow the instructions below for a seamless experience.
 
