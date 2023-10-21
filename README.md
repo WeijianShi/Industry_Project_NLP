@@ -47,4 +47,10 @@ Enjoy using the NDA Processing Tool, and feel free to reach out to our technical
 
 
 
+### NDA Pipeline Visualization
+![Image Description](https://github.com/your-username/your-repository/raw/main/path-to-your-image.jpg)
+
+
+
+
 
