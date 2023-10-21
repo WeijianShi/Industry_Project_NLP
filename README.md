@@ -2,8 +2,23 @@
 
 ## Instruction Manual--NDA Processing Tool
 
-Welcome to the NDA Processing Tool! This tool is designed by Weijian Shi, Shaoxiong Jia, and Yichen Li. The purpose is to help you efficiently process Non-Disclosure Agreement (NDA) documents and extract the desired content. Please follow the instructions below for a seamless experience.
+Welcome to the NDA Processing Tool! This tool is designed by Weijian Shi, Shaoxiong Jia, and Yichen Li. The purpose is
+to help you efficiently process Non-Disclosure Agreement (NDA) documents. Please follow
+the instructions below for a seamless experience.
 
+### Why This Tool?
+In the NDA (None Disclosure Agreement), it always has some dealbreaking words. In different clauses, certain words could be treated
+as "deal-breaking". For instance, in the "Disclosure" section, the word "exclusively" is not appropriate,
+since in the current stage, both party in the agreement is only signing a non-disclosure agreement, rather than an 
+official cooperation contract. Our end-to-end solution aims to detect these errors and provide modification suggestions
+to the user. Check out the pipeline's flow chart and instructions below!
+
+
+
+
+### NDA Pipeline Visualization
+Here is the workflow of the pipeline
+<img src="https://github.com/WeijianShi/Industry_Project_NLP/blob/main/Image/Flowchart.jpeg">
 ### First Use
 
 1. Click on the three dots located to the right of the folder.
@@ -47,9 +62,7 @@ Enjoy using the NDA Processing Tool, and feel free to reach out to our technical
 
 
 
-### NDA Pipeline Visualization
-Here is the workflow of the pipeline
-<img src="https://github.com/WeijianShi/Industry_Project_NLP/blob/main/Image/Flowchart.jpeg">
+
 
 
 
